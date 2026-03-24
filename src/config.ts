@@ -51,6 +51,24 @@ export function getMsBankingConfigFromEnv(): MsBankingConfig {
   };
 }
 
+function maskSecret(value: string): string {
+  if (value.length <= 8) return '***';
+  return `${value.slice(0, 4)}***${value.slice(-4)}`;
+}
+
+/**
+ * Logs current ms-banking config with secrets masked (e.g. for debugging).
+ */
+export function logMsBankingConfig(config: MsBankingConfig): void {
+  console.log('[spa-checkout] MS_BANKING config:', {
+    baseUrl: config.baseUrl,
+    apiKey: maskSecret(config.apiKey),
+    orgId: config.orgId,
+    bankCode: config.bankCode,
+    digitalAccountPinbankId: config.digitalAccountPinbankId,
+  });
+}
+
 /**
  * Merges env-based config with optional overrides (e.g. for tests).
  * If override contains all required fields, it is used as-is (no env needed).
@@ -59,10 +77,13 @@ export function resolveMsBankingConfig(
   override?: Partial<MsBankingConfig>,
 ): MsBankingConfig {
   if (override && isFullConfig(override)) {
+    logMsBankingConfig(override);
     return override;
   }
   const fromEnv = getMsBankingConfigFromEnv();
-  return { ...fromEnv, ...override };
+  const config = { ...fromEnv, ...override };
+  logMsBankingConfig(config);
+  return config;
 }
 
 function isFullConfig(o: Partial<MsBankingConfig>): o is MsBankingConfig {

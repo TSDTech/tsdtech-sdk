@@ -16,16 +16,21 @@ export interface PixAmount {
 }
 
 /**
- * Success response from ms-banking POST /pix-deposit-intents/api-key.
+ * Success response from ms-banking (POST create and GET by id).
+ * GET returns: id, createdAtUtc, updatedAtUtc, digitalAccountPinbankId, urlCheckout, pinbankQrCodeId, qrCodeText, base64Path.
+ * Create response may omit createdAtUtc/updatedAtUtc; paid flow may add nsuTransfer, endToEnd, paidAtUtc, etc.
  */
 export interface PixDepositIntentSuccessResponse {
+  id: string;
+  createdAtUtc?: string;
+  updatedAtUtc?: string;
   digitalAccountPinbankId: string;
   urlCheckout: string;
-  nsuTransfer: string;
   pinbankQrCodeId: string;
   qrCodeText: string;
   base64Path: string;
-  endToEnd: string;
+  nsuTransfer?: string;
+  endToEnd?: string;
   originalAmount?: PixAmount;
   paidAmount?: PixAmount;
   paidAtUtc?: string;
@@ -46,4 +51,13 @@ export interface MsBankingErrorPayload {
 /** Response body shape when ms-banking returns an error. */
 export interface MsBankingErrorResponse {
   error: MsBankingErrorPayload;
+}
+
+/**
+ * Response from GET /pix-deposit-intents/api-key (list by ids).
+ * Paginated shape: items array and pageCount.
+ */
+export interface GetPixDepositIntentsResponse {
+  items: PixDepositIntentSuccessResponse[];
+  pageCount: number;
 }
