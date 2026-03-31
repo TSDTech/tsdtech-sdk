@@ -38,6 +38,21 @@ function truncateForLog(value: string, maxLen = 80): string {
   return `${value.slice(0, maxLen)}... (${value.length} chars)`;
 }
 
+const ISO_UTC_SECONDS_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+
+/**
+ * Ensures dueDate is in UTC ISO format without milliseconds (YYYY-MM-DDTHH:mm:ssZ).
+ */
+function normalizeDueDateUtcIso(value: string): string {
+  if (ISO_UTC_SECONDS_REGEX.test(value)) return value;
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+
+  // Drop milliseconds to match ms-banking expected dueDate shape.
+  return parsed.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
 /**
  * Creates a PIX deposit intent via ms-banking (Pinbank).
  * On success returns the response with qrCodeText, base64Path, etc.
@@ -231,7 +246,7 @@ export async function createSlipDepositIntent(
 
   const body = {
     digitalAccountPinbankId: config.digitalAccountPinbankId,
-    dueDate: input.dueDate,
+    dueDate: normalizeDueDateUtcIso(input.dueDate),
     value: input.value,
     email: input.email,
     payerData: input.payerData,
