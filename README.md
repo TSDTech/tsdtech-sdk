@@ -1,6 +1,6 @@
-# spa-checkout
+# tsdtech-sdk
 
-Biblioteca Node.js para SPA Checkout (integração PIX com ms-banking / Pinbank).
+Biblioteca Node.js para SPA Checkout (PIX, Boleto) e gerenciamento de subcontas com integração ao **ms-subaccount**.
 
 ## Requisitos
 
@@ -28,76 +28,149 @@ npm run build:watch
 
 ## Uso local no spa-backend (testar sem publicar)
 
-Com os dois projetos no mesmo nível (ex.: `workspace/spa-checkout` e `workspace/spa-backend`):
+Com os dois projetos no mesmo nível (ex.: `workspace/tsdtech-sdk` e `workspace/spa-backend`):
 
 1. **Buildar a lib** (obrigatório; o backend usa o que está em `dist/`):
 
    ```bash
-   cd /caminho/para/spa-checkout
+   cd /caminho/para/tsdtech-sdk
    npm run build
    ```
 
-2. **Instalar no backend** – no `spa-backend` já está configurado `"spa-checkout": "file:../spa-checkout"`. Rode no backend:
+2. **Instalar no backend** – no `spa-backend` já está configurado `"tsdtech-sdk": "file:../tsdtech-sdk"`. Rode no backend:
 
    ```bash
    cd /caminho/para/spa-backend
    npm install
    ```
 
-   O npm vai linkar/copiar a pasta local para `node_modules/spa-checkout`. Sempre que alterar o código da lib, rode de novo `npm run build` na pasta da lib (ou use `npm run build:watch` num terminal e deixe rodando).
+   O npm vai linkar/copiar a pasta local para `node_modules/tsdtech-sdk`. Sempre que alterar o código da lib, rode de novo `npm run build` na pasta da lib (ou use `npm run build:watch` num terminal e deixe rodando).
 
 **Alternativa com `npm link`** (symlink global; ver o pacote atualizado sem reinstalar):
 
 ```bash
 # Na pasta da lib (uma vez)
-cd spa-checkout
+cd tsdtech-sdk
 npm run build
 npm link
 
 # No backend (uma vez)
 cd spa-backend
-npm link spa-checkout
+npm link tsdtech-sdk
 ```
 
-Depois disso, qualquer `npm run build` em `spa-checkout` já deixa o backend usando a versão nova.
+Depois disso, qualquer `npm run build` em `tsdtech-sdk` já deixa o backend usando a versão nova.
 
-## Uso (API PIX)
+## Uso (Quick Start)
 
-Variáveis de ambiente (no app que consome a lib): `MS_BANKING_BASE_URL`, `MS_BANKING_API_KEY`, `MS_BANKING_ORG_ID`, `MS_BANKING_BANK_CODE`, `MS_BANKING_DIGITAL_ACCOUNT_PINBANK_ID`.
+Instancie `TsdTechSdk` com suas credenciais e comece a usar:
 
 ```ts
-import {
-  createPixDepositIntent,
-  PixDepositIntentError,
-} from 'spa-checkout';
+import { TsdTechSdk, SubaccountStatusEnum } from "tsdtech-sdk";
+import crypto from "crypto";
 
-// Criar intenção PIX (externalId = ex.: ID do pedido)
-const res = await createPixDepositIntent({
-  cpfCnpj: '12345678900',
-  value: 130,
-  externalId: orderId,
+// Inicializar
+const sdk = new TsdTechSdk({
+  bankingApiKey: process.env.BANKING_API_KEY,
+  bankingOrgId: process.env.BANKING_ORG_ID,
 });
-// res.base64Path, res.qrCodeText, etc.
 
-// Em caso de erro (4xx/5xx do ms-banking)
-catch (err) {
-  if (err instanceof PixDepositIntentError) {
-    // err.code, err.title, err.status, err.message, err.details
-  }
-}
+// Criar depósito PIX
+const pixDeposit = await sdk.createPixDepositRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 100.0,
+  },
+  crypto.randomUUID(),
+);
+console.log("QR Code:", pixDeposit.textQrCode);
+console.log("Base64:", pixDeposit.base64Path);
+
+// Criar depósito Boleto
+const dueDate = new Date();
+dueDate.setDate(dueDate.getDate() + 3);
+const formattedDueDate = dueDate.toISOString().replace(/\.\d{3}Z$/, "Z");
+
+const slipDeposit = await sdk.createSlipDepositRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 150.0,
+    dueDate: formattedDueDate,
+    payer: {
+      name: "João da Silva",
+      taxId: 12345678909,
+      address: "Rua das APIs, 123",
+      neighborhood: "Bairro do Código",
+      city: "São Paulo",
+      state: "SP",
+      zipCode: "01001000",
+    },
+  },
+  crypto.randomUUID(),
+);
+console.log("Código de barras:", slipDeposit.digitableLine);
+
+// Criar subaccount
+const subaccount = await sdk.createSubaccount({
+  holderId: "uuid-do-titular",
+  digitalAccountId: "uuid-da-conta-digital",
+  name: "Minha Subconta",
+  status: SubaccountStatusEnum.ACTIVE,
+});
+console.log("Subaccount ID:", subaccount.id);
+
+// Listar subcontas
+const subaccounts = await sdk.getSubaccounts(
+  { statuses: [SubaccountStatusEnum.ACTIVE] },
+  { page: 1, pageSize: 10 },
+);
+console.log(`Total: ${subaccounts.totalItems}`);
 ```
+
+Para mais detalhes, consulte a [Documentação de integração](docs/integration.md).
+
+## Métodos disponíveis
+
+| Método                       | Descrição                                   |
+| ---------------------------- | ------------------------------------------- |
+| `createPixDepositRequest()`  | Cria uma solicitação de depósito via PIX    |
+| `createSlipDepositRequest()` | Cria uma solicitação de depósito via Boleto |
+| `createSubaccount()`         | Cria uma nova subaconta                     |
+| `getSubaccounts()`           | Lista subcontas com filtros e paginação     |
 
 ## Estrutura
 
 ```
-spa-checkout/
+tsdtech-sdk/
 ├── src/
-│   ├── index.ts
-│   ├── config.ts
-│   ├── errors.ts
-│   ├── pix-deposit-intent.types.ts
-│   └── ms-banking-client.ts
-├── dist/           # gerado pelo build (não versionar)
+│   ├── index.ts                    # Exports principais
+│   ├── client/
+│   │   ├── base-sdk.client.ts      # Cliente base com configuração HTTP
+│   │   └── sdk.client.ts           # Implementação dos métodos
+│   ├── dto/
+│   │   ├── common/
+│   │   │   └── pagination.interface.ts
+│   │   ├── deposit-request/
+│   │   │   ├── pix/
+│   │   │   │   ├── create-pix-deposit-request.interface.ts
+│   │   │   │   ├── deposit-request-response.interface.ts
+│   │   │   │   ├── payment-method.enum.ts
+│   │   │   │   └── status.enum.ts
+│   │   │   └── slip/
+│   │   │       ├── create-slip-deposit-request.interface.ts
+│   │   │       └── slip-deposit-payer.interface.ts
+│   │   └── subaccount/
+│   │       ├── subaccount-status.enum.ts
+│   │       ├── create/
+│   │       │   ├── create-subaccount.interface.ts
+│   │       │   └── create-subaccount-response.interface.ts
+│   │       └── filter/
+│   │           └── filter-subaccounts.interface.ts
+│   └── test.ts                     # Exemplos de teste
+├── dist/                           # Gerado pelo build (não versionar)
+├── docs/
+│   ├── README.md
+│   └── integration.md              # Documentação detalhada
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -105,9 +178,13 @@ spa-checkout/
 
 ## Scripts
 
-| Script | Descrição |
-|--------|-----------|
-| `npm run build` | Compila TypeScript → `dist/` |
-| `npm run build:watch` | Compila e recompila ao salvar |
-| `npm run clean` | Remove `dist/` |
+| Script                   | Descrição                     |
+| ------------------------ | ----------------------------- |
+| `npm run build`          | Compila TypeScript → `dist/`  |
+| `npm run build:watch`    | Compila e recompila ao salvar |
+| `npm run clean`          | Remove `dist/`                |
 | `npm run prepublishOnly` | Roda antes de publicar no npm |
+
+## Documentação
+
+- [Documentação de integração](docs/integration.md) – Guia completo com exemplos de uso e tratamento de erros.

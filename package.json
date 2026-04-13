@@ -1,5 +1,5 @@
 {
-  "name": "spa-checkout",
+  "name": "tsdtech-sdk",
   "version": "0.1.0",
   "description": "SPA Checkout library",
   "type": "module",
@@ -25,7 +25,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.9.0",
+    "@types/node": "^22.19.17",
     "typescript": "^5.6.3"
   },
   "dependencies": {
