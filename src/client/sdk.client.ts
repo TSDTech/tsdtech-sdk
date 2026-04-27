@@ -1,6 +1,8 @@
 import { PaginatedListResponse, PaginationInput } from "../dto/common/pagination.interface.js";
 import { CreatePixDepositRequestInput as CreatePixDepositRequest } from "../dto/deposit-request/pix/create-pix-deposit-request.interface.js";
 import { DepositRequestResponse } from "../dto/deposit-request/pix/deposit-request-response.interface.js";
+import { FilterDepositSplitInput } from "../dto/deposit-request/pix/splits/filter-deposit-splits.interface.js";
+import { DepositSplitResponse } from "../dto/deposit-request/pix/splits/deposit-split-response.interface.js";
 import { CreateSlipDepositRequestInput } from "../dto/deposit-request/slip/create-slip-deposit-request.interface.js";
 import { SubaccountResponse } from "../dto/subaccount/create/create-subaccount-response.interface.js";
 import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/create/create-subaccount.interface.js";
@@ -21,16 +23,16 @@ export class TsdTechSdk extends BaseSdkClient {
 
   /**
    * Creates a Pix deposit request for a specific subaccount.
-   * * @param input - The payload containing the subaccount ID and the deposit amount.
+   * @param input - The payload containing the subaccount ID, the deposit amount, and optional split configuration.
    * @param idempotencyKey - A unique identifier (e.g., UUIDv4) to guarantee the idempotency of the request and prevent duplicate transactions.
-   * @returns A promise that resolves to the deposit request details, including the Pix Copy & Paste text and Base64 QR Code.
+   * @returns A promise that resolves to the deposit request details, including the Pix Copy & Paste text, Base64 QR Code, and any configured splits.
    * @throws {CheckoutApiError} If the API returns an error or a bad request.
    */
   public async createPixDepositRequest(
     input: CreatePixDepositRequest,
     idempotencyKey: string
   ): Promise<DepositRequestResponse> {
-   const url = `${this.baseSubaccountUrl}/deposit-request/api-key/pix`;
+    const url = `${this.baseSubaccountUrl}/deposit-request/api-key/pix`;
 
     const { data } = await this.http.post<DepositRequestResponse>(
       url,
@@ -64,6 +66,32 @@ export class TsdTechSdk extends BaseSdkClient {
       {
         headers: {
           'idempotency-key': idempotencyKey,
+        },
+      }
+    );
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated list of PIX deposit splits.
+   * Supports optional filtering by deposit request IDs, subaccount IDs, statuses, etc.
+   * * @param filters - Optional filters to apply to the search query.
+   * @param pagination - Optional pagination parameters (`page` and `pageSize`).
+   * @returns A promise that resolves to a paginated list of deposit splits.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async getDepositSplits(
+    filters?: FilterDepositSplitInput,
+    pagination?: PaginationInput
+  ): Promise<PaginatedListResponse<DepositSplitResponse>> {
+    const url = `${this.baseSubaccountUrl}/deposit-split-pix/api-key`;
+
+    const { data } = await this.http.get<PaginatedListResponse<DepositSplitResponse>>(
+      url,
+      {
+        params: {
+          ...filters,
+          ...pagination,
         },
       }
     );

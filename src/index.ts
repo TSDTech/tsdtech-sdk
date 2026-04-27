@@ -16,3 +16,8 @@ export type { SubaccountResponse } from './dto/subaccount/create/create-subaccou
 export { SubaccountStatusEnum } from './dto/subaccount/subaccount-status.enum.js';
 export type { FilterSubaccountInput } from './dto/subaccount/filter/filter-subaccounts.interface.js';
 export type { PaginationInput, PaginatedListResponse } from './dto/common/pagination.interface.js';
+export { SplitDestinationType } from './dto/deposit-request/pix/splits/split-destination-type.enum.js';
+export { DepositSplitStatus } from './dto/deposit-request/pix/splits/split-status.enum.js';
+export type { DepositSplitItem } from './dto/deposit-request/pix/splits/deposit-split-item.interface.js';
+export type { DepositSplitResponse } from './dto/deposit-request/pix/splits/deposit-split-response.interface.js';
+export type { FilterDepositSplitInput } from './dto/deposit-request/pix/splits/filter-deposit-splits.interface.js';
