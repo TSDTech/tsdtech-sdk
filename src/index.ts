@@ -16,3 +16,9 @@ export type { SubaccountResponse } from './dto/subaccount/create/create-subaccou
 export { SubaccountStatusEnum } from './dto/subaccount/subaccount-status.enum.js';
 export type { FilterSubaccountInput } from './dto/subaccount/filter/filter-subaccounts.interface.js';
 export type { PaginationInput, PaginatedListResponse } from './dto/common/pagination.interface.js';
+export type { CreateSubaccountHolderInput } from './dto/subaccount-holder/create/create-subaccount-holder-input.interface.js';
+export type { CreateSubaccountInlineInput } from './dto/subaccount-holder/create/create-subaccount-holder-input.interface.js';
+export type { CreateSubaccountHolderResponse } from './dto/subaccount-holder/create/create-subaccount-holder-response.interface.js';
+export type { SubaccountHolderResponse } from './dto/subaccount-holder/subaccount-holder-response.interface.js';
+export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
+export { SubaccountHolderStatusEnum } from './dto/subaccount-holder/subaccount-holder-status.enum.js';

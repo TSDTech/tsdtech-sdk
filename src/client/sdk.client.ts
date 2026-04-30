@@ -1,3 +1,5 @@
+import { CreateSubaccountHolderInput as CreateSubaccountHolder } from "../dto/subaccount-holder/create/create-subaccount-holder-input.interface.js";
+import { CreateSubaccountHolderResponse } from "../dto/subaccount-holder/create/create-subaccount-holder-response.interface.js";
 import { PaginatedListResponse, PaginationInput } from "../dto/common/pagination.interface.js";
 import { CreatePixDepositRequestInput as CreatePixDepositRequest } from "../dto/deposit-request/pix/create-pix-deposit-request.interface.js";
 import { DepositRequestResponse } from "../dto/deposit-request/pix/deposit-request-response.interface.js";
@@ -107,6 +109,32 @@ export class TsdTechSdk extends BaseSdkClient {
         },
       }
     );
+    return data;
+  }
+
+  /**
+   * Creates a new subaccount holder with optional inline subaccount creation.
+   * * @param input - The data required to create the subaccount holder, such as name, document, and optional subaccount data.
+   * @param idempotencyKey - A unique identifier (e.g., UUIDv4) to guarantee the idempotency of the request.
+   * @returns A promise that resolves to the created subaccount holder and optionally the created subaccount.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async createSubaccountHolder(
+    input: CreateSubaccountHolder,
+    idempotencyKey: string
+  ): Promise<CreateSubaccountHolderResponse> {
+    const url = `${this.baseSubaccountUrl}/sub-account-holders/api-key/create`;
+
+    const { data } = await this.http.post<CreateSubaccountHolderResponse>(
+      url,
+      input,
+      {
+        headers: {
+          'idempotency-key': idempotencyKey,
+        },
+      }
+    );
+
     return data;
   }
 }
