@@ -26,7 +26,7 @@ Para desenvolvimento com rebuild automático ao salvar:
 npm run build:watch
 ```
 
-## Uso local no spa-backend (testar sem publicar)
+## Uso local no spa-backend
 
 Com os dois projetos no mesmo nível (ex.: `workspace/tsdtech-sdk` e `workspace/spa-backend`):
 
