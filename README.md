@@ -1,6 +1,6 @@
 # tsdtech-sdk
 
-Biblioteca Node.js para SPA Checkout (PIX, Boleto) e gerenciamento de subcontas com integração ao **ms-subaccount**.
+Biblioteca Node.js para Tsdtech Checkout (PIX, Boleto) e gerenciamento de subcontas com integração ao **ms-subaccount**.
 
 ## Requisitos
 
@@ -25,41 +25,6 @@ Para desenvolvimento com rebuild automático ao salvar:
 ```bash
 npm run build:watch
 ```
-
-## Uso local no spa-backend
-
-Com os dois projetos no mesmo nível (ex.: `workspace/tsdtech-sdk` e `workspace/spa-backend`):
-
-1. **Buildar a lib** (obrigatório; o backend usa o que está em `dist/`):
-
-   ```bash
-   cd /caminho/para/tsdtech-sdk
-   npm run build
-   ```
-
-2. **Instalar no backend** – no `spa-backend` já está configurado `"tsdtech-sdk": "file:../tsdtech-sdk"`. Rode no backend:
-
-   ```bash
-   cd /caminho/para/spa-backend
-   npm install
-   ```
-
-   O npm vai linkar/copiar a pasta local para `node_modules/tsdtech-sdk`. Sempre que alterar o código da lib, rode de novo `npm run build` na pasta da lib (ou use `npm run build:watch` num terminal e deixe rodando).
-
-**Alternativa com `npm link`** (symlink global; ver o pacote atualizado sem reinstalar):
-
-```bash
-# Na pasta da lib (uma vez)
-cd tsdtech-sdk
-npm run build
-npm link
-
-# No backend (uma vez)
-cd spa-backend
-npm link tsdtech-sdk
-```
-
-Depois disso, qualquer `npm run build` em `tsdtech-sdk` já deixa o backend usando a versão nova.
 
 ## Uso (Quick Start)
 
