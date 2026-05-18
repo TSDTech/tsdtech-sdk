@@ -8,6 +8,8 @@ import { SubaccountResponse } from "../dto/subaccount/create/create-subaccount-r
 import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/create/create-subaccount.interface.js";
 import { FilterSubaccountInput } from "../dto/subaccount/filter/filter-subaccounts.interface.js";
 import { BaseSdkClient } from "./base-sdk.client.js";
+import { CardDepositRequestResponse, CreateCardDepositRequestDto } from "../dto/deposit-request/card/create-card-deposit-request.interface.js";
+import { validateCardSplits } from "../dto/deposit-request/card/validate-card-splits.js";
 
 /**
  * Main client for the TSD Tech SDK.
@@ -136,5 +138,31 @@ export class TsdTechSdk extends BaseSdkClient {
     );
 
     return data;
+  }
+
+  /**
+   * Cria uma requisição de depósito via Cartão com suporte opcional a Split Rules.
+   * * @param dto Dados da transação (cartão, valor, subconta e splits)
+   * @returns Promise<CardDepositRequestResponse>
+   */
+  public async createCardDepositRequest(
+    dto: CreateCardDepositRequestDto
+  ): Promise<CardDepositRequestResponse> {
+    // 1. Validação Client-Side dos Splits
+    validateCardSplits(dto.amount, dto.splits);
+
+    // 2. Preparar Payload (Garante o default de 1 parcela)
+    const payload: CreateCardDepositRequestDto = {
+      ...dto,
+      installmentNumber: dto.installmentNumber ?? 1,
+    };
+
+    // 3. Chamada à API
+    const response = await this.http.post(
+      '/deposit-request/card',
+      payload
+    );
+
+    return response.data as CardDepositRequestResponse;
   }
 }

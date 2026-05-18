@@ -22,3 +22,7 @@ export type { CreateSubaccountHolderResponse } from './dto/subaccount-holder/cre
 export type { SubaccountHolderResponse } from './dto/subaccount-holder/subaccount-holder-response.interface.js';
 export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
 export { SubaccountHolderStatusEnum } from './dto/subaccount-holder/subaccount-holder-status.enum.js';
+
+// Card Deposit Request & Splits
+export { CreateCardDepositRequestDto, CardDepositRequestResponse } from './dto/deposit-request/card/create-card-deposit-request.interface.js';
+export { validateCardSplits } from './dto/deposit-request/card/validate-card-splits.js';
