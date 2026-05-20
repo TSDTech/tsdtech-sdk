@@ -1,5 +1,6 @@
 import { PaymentMethod } from "./payment-method.enum.js";
 import { DepositRequestStatus } from "./status.enum.js";
+import { DepositSplitResponse } from "./splits/deposit-split-response.interface.js";
 
 /**
  * Detailed information of a created or retrieved deposit request.
@@ -30,4 +31,10 @@ export interface DepositRequestResponse {
   digitableLine?: string;
   /** The raw barcode numerical sequence. */
   barCode?: string;
+
+  /**
+   * List of splits associated with this deposit request.
+   * Present only when the deposit was created with splits configuration.
+   */
+  splits?: DepositSplitResponse[];
 }
