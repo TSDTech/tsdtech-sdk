@@ -2,6 +2,7 @@ import { CreateSubaccountHolderInput as CreateSubaccountHolder } from "../dto/su
 import { CreateSubaccountHolderResponse } from "../dto/subaccount-holder/create/create-subaccount-holder-response.interface.js";
 import { PaginatedListResponse, PaginationInput } from "../dto/common/pagination.interface.js";
 import { CreatePixDepositRequestInput as CreatePixDepositRequest } from "../dto/deposit-request/pix/create-pix-deposit-request.interface.js";
+import { CreateGenericDepositRequestInput as CreateGenericDepositRequest } from "../dto/deposit-request/create-generic-deposit-request.interface.js";
 import { DepositRequestResponse } from "../dto/deposit-request/pix/deposit-request-response.interface.js";
 import { FilterDepositSplitInput } from "../dto/deposit-request/pix/splits/filter-deposit-splits.interface.js";
 import { DepositSplitResponse } from "../dto/deposit-request/pix/splits/deposit-split-response.interface.js";
@@ -71,6 +72,33 @@ export class TsdTechSdk extends BaseSdkClient {
         },
       }
     );
+    return data;
+  }
+
+  /**
+   * Creates a generic deposit request without a predefined payment method.
+   * The deposit can be updated later with a specific method (PIX, SLIP, CARD, etc.).
+   * @param input - The payload containing the subaccount ID, the deposit amount, and optional split configuration.
+   * @param idempotencyKey - A unique identifier (e.g., UUIDv4) to guarantee the idempotency of the request and prevent duplicate transactions.
+   * @returns A promise that resolves to the deposit request details.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async createGenericDepositRequest(
+    input: CreateGenericDepositRequest,
+    idempotencyKey: string
+  ): Promise<DepositRequestResponse> {
+    const url = `${this.baseSubaccountUrl}/deposit-request/api-key/generic`;
+
+    const { data } = await this.http.post<DepositRequestResponse>(
+      url,
+      input,
+      {
+        headers: {
+          'idempotency-key': idempotencyKey,
+        },
+      }
+    );
+
     return data;
   }
 

@@ -6,6 +6,7 @@
 export { TsdTechSdk } from './client/sdk.client.js';
 export { BaseSdkClient } from './client/base-sdk.client.js';
 export type { CreatePixDepositRequestInput } from './dto/deposit-request/pix/create-pix-deposit-request.interface.js';
+export type { CreateGenericDepositRequestInput } from './dto/deposit-request/create-generic-deposit-request.interface.js';
 export type { DepositRequestResponse } from './dto/deposit-request/pix/deposit-request-response.interface.js';
 export { PaymentMethod } from './dto/deposit-request/pix/payment-method.enum.js';
 export { DepositRequestStatus } from './dto/deposit-request/pix/status.enum.js';
