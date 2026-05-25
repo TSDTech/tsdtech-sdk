@@ -1,23 +1,23 @@
 {
   "name": "tsdtech-sdk",
-  "version": "0.1.4",
-  "description": "SPA Checkout library",
-  "type": "module",
+  "version": "0.1.5",
+  "description": "TSDTech Checkout library",
+  "module": "./dist/index.mjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build:watch": "tsup --watch",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build"
   },
@@ -26,6 +26,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.19.17",
+    "tsup": "^8.5.1",
     "typescript": "^5.6.3"
   },
   "dependencies": {
