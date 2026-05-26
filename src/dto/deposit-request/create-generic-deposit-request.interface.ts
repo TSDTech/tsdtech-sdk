@@ -10,6 +10,13 @@ export interface CreateGenericDepositRequestInput {
   subaccountId: string;
   /** The total amount to be deposited. */
   amount: number;
+  
+  /** Optional summary of items to be included in the deposit. */
+  items_summary?: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
   /**
    * Optional list of splits to distribute the deposit amount.
    * If provided, the sum of split amounts must not exceed the total deposit amount.

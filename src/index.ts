@@ -4,7 +4,8 @@
  */
 
 export { TsdTechSdk } from './client/sdk.client.js';
-export { BaseSdkClient } from './client/base-sdk.client.js';
+export { BaseSdkClient, BASE_ENVIRONMENT_URLS } from './client/base-sdk.client.js';
+export type { SdkEnvironment } from './client/base-sdk.client.js';
 export type { CreatePixDepositRequestInput } from './dto/deposit-request/pix/create-pix-deposit-request.interface.js';
 export type { CreateGenericDepositRequestInput } from './dto/deposit-request/create-generic-deposit-request.interface.js';
 export type { DepositRequestResponse } from './dto/deposit-request/pix/deposit-request-response.interface.js';
@@ -22,3 +23,4 @@ export { DepositSplitStatus } from './dto/deposit-request/pix/splits/split-statu
 export type { DepositSplitItem } from './dto/deposit-request/pix/splits/deposit-split-item.interface.js';
 export type { DepositSplitResponse } from './dto/deposit-request/pix/splits/deposit-split-response.interface.js';
 export type { FilterDepositSplitInput } from './dto/deposit-request/pix/splits/filter-deposit-splits.interface.js';
+export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
