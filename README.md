@@ -31,7 +31,12 @@ npm run build:watch
 Instancie `TsdTechSdk` com suas credenciais e comece a usar:
 
 ```ts
-import { TsdTechSdk, SubaccountStatusEnum } from "tsdtech-sdk";
+import {
+  TsdTechSdk,
+  SubaccountStatusEnum,
+  WithdrawalRequestStatusEnum,
+  PinBankPaymentAccountTypeEnum,
+} from "tsdtech-sdk";
 import crypto from "crypto";
 
 // Inicializar
@@ -90,18 +95,67 @@ const subaccounts = await sdk.getSubaccounts(
   { page: 1, pageSize: 10 },
 );
 console.log(`Total: ${subaccounts.totalItems}`);
+
+// Criar saque interno (transferência entre subcontas)
+const internalWithdrawal = await sdk.createWithdrawalRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 200.0,
+    destinationSubaccountId: "660e8400-e29b-41d4-a716-446655440001",
+  },
+  crypto.randomUUID(),
+);
+console.log("Saque interno:", internalWithdrawal.id, internalWithdrawal.status);
+
+// Criar saque PIX externo
+const pixWithdrawal = await sdk.createWithdrawalRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 150.0,
+    pixKey: "destinatario@example.com",
+  },
+  crypto.randomUUID(),
+);
+console.log("Saque PIX:", pixWithdrawal.id);
+
+// Criar saque TED externo
+const tedWithdrawal = await sdk.createWithdrawalRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 500.0,
+    beneficiary: {
+      bankNumber: "001",
+      bankBranch: "0001",
+      accountNumber: "123456-7",
+      name: "Maria Souza",
+      document: "98765432100",
+      accountType: PinBankPaymentAccountTypeEnum.CACC,
+    },
+  },
+  crypto.randomUUID(),
+);
+console.log("Saque TED:", tedWithdrawal.id);
+
+// Listar saques pendentes
+const withdrawals = await sdk.getWithdrawalRequests(
+  { statuses: [WithdrawalRequestStatusEnum.PENDING] },
+  { page: 1, pageSize: 10 },
+);
+console.log(`Saques pendentes: ${withdrawals.totalItems}`);
 ```
 
 Para mais detalhes, consulte a [Documentação de integração](docs/integration.md).
 
 ## Métodos disponíveis
 
-| Método                       | Descrição                                   |
-| ---------------------------- | ------------------------------------------- |
-| `createPixDepositRequest()`  | Cria uma solicitação de depósito via PIX    |
-| `createSlipDepositRequest()` | Cria uma solicitação de depósito via Boleto |
-| `createSubaccount()`         | Cria uma nova subaconta                     |
-| `getSubaccounts()`           | Lista subcontas com filtros e paginação     |
+| Método                          | Descrição                                         |
+| ------------------------------- | ------------------------------------------------- |
+| `createPixDepositRequest()`     | Cria uma solicitação de depósito via PIX           |
+| `createSlipDepositRequest()`    | Cria uma solicitação de depósito via Boleto        |
+| `createSubaccount()`            | Cria uma nova subaconta                           |
+| `getSubaccounts()`              | Lista subcontas com filtros e paginação           |
+| `createWithdrawalRequest()`     | Cria um saque (interno, PIX ou TED)               |
+| `getWithdrawalRequests()`       | Lista saques com filtros e paginação              |
 
 ## Estrutura
 
@@ -124,13 +178,21 @@ tsdtech-sdk/
 │   │   │   └── slip/
 │   │   │       ├── create-slip-deposit-request.interface.ts
 │   │   │       └── slip-deposit-payer.interface.ts
-│   │   └── subaccount/
-│   │       ├── subaccount-status.enum.ts
-│   │       ├── create/
-│   │       │   ├── create-subaccount.interface.ts
-│   │       │   └── create-subaccount-response.interface.ts
-│   │       └── filter/
-│   │           └── filter-subaccounts.interface.ts
+│   │   ├── subaccount/
+│   │   │   ├── subaccount-status.enum.ts
+│   │   │   ├── create/
+│   │   │   │   ├── create-subaccount.interface.ts
+│   │   │   │   └── create-subaccount-response.interface.ts
+│   │   │   └── filter/
+│   │   │       └── filter-subaccounts.interface.ts
+│   │   └── withdrawal-request/
+│   │       ├── create-withdrawal-request-input.interface.ts
+│   │       ├── withdrawal-request-response.interface.ts
+│   │       ├── filter-withdrawal-request-input.interface.ts
+│   │       ├── beneficiary-data.interface.ts
+│   │       ├── withdrawal-request-status.enum.ts
+│   │       ├── pinbank-payment-account-type.enum.ts
+│   │       └── index.ts
 │   └── test.ts                     # Exemplos de teste
 ├── dist/                           # Gerado pelo build (não versionar)
 ├── docs/

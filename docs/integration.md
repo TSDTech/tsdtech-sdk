@@ -1,6 +1,6 @@
 # Documentação de integração – tsdtech-sdk
 
-Esta pasta descreve como integrar a biblioteca **tsdtech-sdk** no seu backend para fluxos de checkout (PIX, Boleto) e gerenciamento de subcontas com integração ao **ms-subaccount**.
+Esta pasta descreve como integrar a biblioteca **tsdtech-sdk** no seu backend para fluxos de checkout (PIX, Boleto), saques (Withdrawal) e gerenciamento de subcontas com integração ao **ms-subaccount**.
 
 ## Índice
 
@@ -8,6 +8,7 @@ Esta pasta descreve como integrar a biblioteca **tsdtech-sdk** no seu backend pa
 - [Instalação](#instalação)
 - [Inicialização](#inicialização)
 - [API](#api)
+- [Saques (Withdrawal)](#saques-withdrawal)
 - [Integração no backend (exemplo Nest)](#integração-no-backend-exemplo-nest)
 - [Tratamento de erros](#tratamento-de-erros)
 
@@ -19,7 +20,7 @@ A **tsdtech-sdk** é uma lib Node.js que:
 
 - Expõe DTOs e a lógica de integração com o **ms-subaccount** (gerenciamento de subcontas e criação de intents de depósito).
 - **Não** expõe endpoints HTTP; quem expõe rotas é o seu backend (ex.: spa-backend).
-- É consumida como dependência: o backend instancia `TsdTechSdk()` e chama seus métodos para criar depósitos PIX, boletos ou gerenciar subcontas.
+- É consumida como dependência: o backend instancia `TsdTechSdk()` e chama seus métodos para criar depósitos PIX, boletos, saques (withdrawal) ou gerenciar subcontas.
 
 Fluxo resumido:
 
@@ -29,6 +30,7 @@ Fluxo resumido:
 4. Backend chama `createPixDepositRequest()` ou `createSlipDepositRequest()` com a subaccount e valor.
 5. A lib envia POST para o ms-subaccount e retorna QR Code, código de barras, etc.
 6. Backend mapeia a resposta para o DTO do seu contrato (ex.: `PixResponseDto`) e devolve ao cliente.
+7. Para saques, backend chama `createWithdrawalRequest()` com o destino (subaconta interna, PIX ou TED) e a lib envia POST ao ms-subaccount.
 
 ---
 
@@ -362,6 +364,171 @@ const filtered = await sdk.getSubaccounts(
 
 ---
 
+## Saques (Withdrawal)
+
+### 5. `createWithdrawalRequest(input, idempotencyKey)`
+
+Cria uma solicitação de saque a partir de uma subaconta. Suporta três tipos de destino: transferência interna entre subcontas, PIX externo e TED externo.
+
+**Assinatura:**
+
+```ts
+public async createWithdrawalRequest(
+  input: CreateWithdrawalRequestInput,
+  idempotencyKey: string
+): Promise<WithdrawalRequestResponse>;
+```
+
+**Input: `CreateWithdrawalRequestInput`**
+
+Forneça exatamente **um** dos campos de destino (`destinationSubaccountId`, `pixKey` ou `beneficiary`).
+
+| Campo                      | Tipo            | Obrigatório | Descrição                                                      |
+| -------------------------- | --------------- | ----------- | -------------------------------------------------------------- |
+| `subaccountId`             | `string`        | Sim         | UUID da subaconta de origem                                    |
+| `amount`                   | `number`        | Sim         | Valor do saque                                                 |
+| `destinationSubaccountId?` | `string`        | Condicional | UUID da subaconta de destino (transferência interna)           |
+| `pixKey?`                  | `string`        | Condicional | Chave PIX do destinatário externo                              |
+| `beneficiary?`             | `BeneficiaryData` | Condicional | Dados bancários do beneficiário para TED externo             |
+
+**`BeneficiaryData`** (TED)
+
+| Campo         | Tipo                           | Descrição                                               |
+| ------------- | ------------------------------ | ------------------------------------------------------- |
+| `bankNumber`  | `string`                       | Código do banco (ISPB ou três dígitos)                  |
+| `bankBranch`  | `string`                       | Número da agência                                       |
+| `accountNumber` | `string`                     | Número da conta bancária                                |
+| `name`        | `string`                       | Nome completo do beneficiário                           |
+| `document`    | `string`                       | CPF ou CNPJ (apenas dígitos)                            |
+| `accountType` | `PinBankPaymentAccountTypeEnum` | Tipo de conta (`CACC`, `TRAN`, `SLRY`, `SVGS`)         |
+
+**`PinBankPaymentAccountTypeEnum`**
+
+| Valor  | Descrição              |
+| ------ | ---------------------- |
+| `CACC` | Conta Corrente         |
+| `TRAN` | Conta de Transação     |
+| `SLRY` | Conta Salário          |
+| `SVGS` | Conta Poupança         |
+
+**Resposta: `WithdrawalRequestResponse`**
+
+| Campo                      | Tipo                           | Descrição                                        |
+| -------------------------- | ------------------------------ | ------------------------------------------------ |
+| `id`                       | `string`                       | UUID do saque criado                             |
+| `subaccountId`             | `string`                       | UUID da subaconta de origem                      |
+| `amount`                   | `number`                       | Valor do saque                                   |
+| `status`                   | `WithdrawalRequestStatusEnum`  | Status atual (ver abaixo)                        |
+| `createdAtUtc`             | `string`                       | Data/hora de criação (ISO 8601 UTC)              |
+| `destinationSubaccountId?` | `string`                       | UUID da subaconta de destino (interno)           |
+| `pixKey?`                  | `string`                       | Chave PIX do destinatário (PIX externo)          |
+| `beneficiary?`             | `BeneficiaryData`              | Dados bancários do beneficiário (TED externo)    |
+
+**`WithdrawalRequestStatusEnum`**
+
+| Valor        | Descrição                   |
+| ------------ | --------------------------- |
+| `PENDING`    | Aguardando processamento    |
+| `PROCESSING` | Em processamento            |
+| `PAID`       | Saque concluído             |
+| `FAILED`     | Falha no processamento      |
+| `REFOUNDED`  | Valor estornado             |
+| `DENIED`     | Saque negado                |
+
+**Exemplos:**
+
+```ts
+import crypto from "crypto";
+import { PinBankPaymentAccountTypeEnum } from "tsdtech-sdk";
+
+// Transferência interna entre subcontas
+const internal = await sdk.createWithdrawalRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 200.0,
+    destinationSubaccountId: "660e8400-e29b-41d4-a716-446655440001",
+  },
+  crypto.randomUUID(),
+);
+console.log("Saque interno criado:", internal.id, "Status:", internal.status);
+
+// PIX externo
+const pix = await sdk.createWithdrawalRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 150.0,
+    pixKey: "destinatario@example.com",
+  },
+  crypto.randomUUID(),
+);
+console.log("Saque PIX criado:", pix.id);
+
+// TED externo
+const ted = await sdk.createWithdrawalRequest(
+  {
+    subaccountId: "550e8400-e29b-41d4-a716-446655440000",
+    amount: 500.0,
+    beneficiary: {
+      bankNumber: "001",
+      bankBranch: "0001",
+      accountNumber: "123456-7",
+      name: "Maria Souza",
+      document: "98765432100",
+      accountType: PinBankPaymentAccountTypeEnum.CACC,
+    },
+  },
+  crypto.randomUUID(),
+);
+console.log("Saque TED criado:", ted.id);
+```
+
+---
+
+### 6. `getWithdrawalRequests(filters?, pagination?)`
+
+Lista saques com filtros e paginação opcionais.
+
+**Assinatura:**
+
+```ts
+public async getWithdrawalRequests(
+  filters?: FilterWithdrawalRequestInput,
+  pagination?: PaginationInput
+): Promise<PaginatedListResponse<WithdrawalRequestResponse>>;
+```
+
+**Input: `FilterWithdrawalRequestInput`** (opcional)
+
+| Campo              | Tipo                            | Descrição                                      |
+| ------------------ | ------------------------------- | ---------------------------------------------- |
+| `ids?`             | `string[]`                      | Filtrar por UUIDs de saques                    |
+| `subaccountIds?`   | `string[]`                      | Filtrar por UUIDs de subcontas de origem       |
+| `pixKeys?`         | `string[]`                      | Filtrar por chaves PIX                         |
+| `statuses?`        | `WithdrawalRequestStatusEnum[]` | Filtrar por status                             |
+| `idempotencyKeys?` | `string[]`                      | Filtrar por chaves de idempotência             |
+| `createdAt?`       | `string`                        | Filtrar por data de criação (ISO 8601 UTC)     |
+
+**Exemplo:**
+
+```ts
+import { WithdrawalRequestStatusEnum } from "tsdtech-sdk";
+
+// Listar todos os saques
+const all = await sdk.getWithdrawalRequests();
+
+// Filtrar saques pendentes de uma subaconta
+const pending = await sdk.getWithdrawalRequests(
+  {
+    subaccountIds: ["550e8400-e29b-41d4-a716-446655440000"],
+    statuses: [WithdrawalRequestStatusEnum.PENDING],
+  },
+  { page: 1, pageSize: 20 },
+);
+console.log(`Saques pendentes: ${pending.totalItems}`);
+```
+
+---
+
 ## Integração no backend (exemplo Nest)
 
 ### Exemplo 1: Criar depósito PIX
@@ -606,6 +773,10 @@ import type {
   FilterSubaccountInput,
   PaginationInput,
   PaginatedListResponse,
+  CreateWithdrawalRequestInput,
+  WithdrawalRequestResponse,
+  FilterWithdrawalRequestInput,
+  BeneficiaryData,
 } from "tsdtech-sdk";
 
 // Enums
@@ -613,6 +784,8 @@ import {
   SubaccountStatusEnum,
   PaymentMethod,
   DepositRequestStatus,
+  WithdrawalRequestStatusEnum,
+  PinBankPaymentAccountTypeEnum,
 } from "tsdtech-sdk";
 
 // Uso completo
