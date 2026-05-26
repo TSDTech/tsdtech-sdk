@@ -10,17 +10,18 @@ import { CreateSlipDepositRequestInput } from "../dto/deposit-request/slip/creat
 import { SubaccountResponse } from "../dto/subaccount/create/create-subaccount-response.interface.js";
 import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/create/create-subaccount.interface.js";
 import { FilterSubaccountInput } from "../dto/subaccount/filter/filter-subaccounts.interface.js";
-import { BaseSdkClient } from "./base-sdk.client.js";
+import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
 
 /**
  * Main client for the TSD Tech SDK.
  */
 export class TsdTechSdk extends BaseSdkClient {
   constructor(params: {
-    bankingApiKey: string,
-    bankingOrgId: string,
-  }
-  ) {
+    bankingApiKey: string;
+    bankingOrgId: string;
+    environment: SdkEnvironment;
+    baseUrl?: string;
+  }) {
     super(params);
   }
 
