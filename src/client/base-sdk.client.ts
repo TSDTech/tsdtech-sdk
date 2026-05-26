@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 
 export class BaseSdkClient {
-  protected readonly baseSubaccountUrl = 'https://dev-back-ms-subaccount-415041877599.southamerica-east1.run.app';
+  protected readonly baseSubaccountUrl = 'https://hml-back-ms-subaccount-415041877599.southamerica-east1.run.app';
   private bankingApiKey: string;
   private bankingOrgId: string;
   protected readonly http: AxiosInstance;
