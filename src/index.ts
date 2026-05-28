@@ -1,8 +1,10 @@
 /**
  * SPA Checkout SDK
  * @packageDocumentation
- */
+*/
 
+export { validateWebhookSignature, signPayload } from './security/validate-webhook-signature.js';
+export type { WebhookSignatureValidationParams, WebhookSignatureValidationResult } from './security/validate-webhook-signature.js';
 export { TsdTechSdk } from './client/sdk.client.js';
 export { BaseSdkClient, BASE_ENVIRONMENT_URLS } from './client/base-sdk.client.js';
 export type { SdkEnvironment } from './client/base-sdk.client.js';
