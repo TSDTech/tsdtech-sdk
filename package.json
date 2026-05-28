@@ -19,7 +19,9 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "build:watch": "tsup --watch",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build"
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -27,7 +29,8 @@
   "devDependencies": {
     "@types/node": "^22.19.17",
     "tsup": "^8.5.1",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^1.5.0"
   },
   "dependencies": {
     "axios": "^1.7.7"
