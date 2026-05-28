@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from "axios";
 export type SdkEnvironment = 'hml' | 'prod';
 
 export const BASE_ENVIRONMENT_URLS: Partial<Record<SdkEnvironment, string>> = {
-  hml: 'https://hml-back-ms-subaccount-415041877599.southamerica-east1.run.app',
+  hml: 'https://hml-back-ms-subaccount-1041798165885.southamerica-east1.run.app',
 };
 
 export class BaseSdkClient {
