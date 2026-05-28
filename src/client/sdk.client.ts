@@ -11,6 +11,8 @@ import { SubaccountResponse } from "../dto/subaccount/create/create-subaccount-r
 import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/create/create-subaccount.interface.js";
 import { FilterSubaccountInput } from "../dto/subaccount/filter/filter-subaccounts.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
+import { DepositRequestPublicStatus } from "../dto/deposit-request/public/deposit-request-public-status.interface.js";
+import axios from "axios";
 
 /**
  * Main client for the TSD Tech SDK.
@@ -193,5 +195,29 @@ export class TsdTechSdk extends BaseSdkClient {
     );
 
     return data;
+  }
+
+  /**
+   * Retrieves the status and details of a Pix deposit request by its ID.
+   * @param depositRequestId - The unique identifier (UUID) of the deposit request.
+   * @returns A promise that resolves to the public status of the deposit request.
+   * @throws {Error} If the API returns a 404 or other errors.
+   */
+  public async getPixDepositStatus(
+    depositRequestId: string
+  ): Promise<DepositRequestPublicStatus> {
+    const url = `${this.baseSubaccountUrl}/deposit-request/public/status-pix/${depositRequestId}`;
+
+    try {
+      const { data } = await this.http.get<DepositRequestPublicStatus>(url);
+      return data;
+    } catch (error: any) {
+      console.error('Error fetching deposit request status:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        throw new Error(`Deposito PIX com ID '${depositRequestId}' não encontrado.`);
+      }
+      
+      throw error;
+    }
   }
 }

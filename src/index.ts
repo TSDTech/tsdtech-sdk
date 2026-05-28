@@ -24,3 +24,4 @@ export type { DepositSplitItem } from './dto/deposit-request/pix/splits/deposit-
 export type { DepositSplitResponse } from './dto/deposit-request/pix/splits/deposit-split-response.interface.js';
 export type { FilterDepositSplitInput } from './dto/deposit-request/pix/splits/filter-deposit-splits.interface.js';
 export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
+export type { DepositRequestPublicStatus } from './dto/deposit-request/public/deposit-request-public-status.interface.js';
