@@ -12,6 +12,8 @@ import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/cre
 import { FilterSubaccountInput } from "../dto/subaccount/filter/filter-subaccounts.interface.js";
 import { FilterStatementInput } from "../dto/subaccount/statement/filter-statement.interface.js";
 import { StatementResponse } from "../dto/subaccount/statement/statement-response.interface.js";
+import { FilterBalanceInput } from "../dto/subaccount/balance/filter-balance.interface.js";
+import { SubaccountBalanceResponse } from "../dto/subaccount/balance/subaccount-balance-response.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
 
 /**
@@ -214,6 +216,32 @@ export class TsdTechSdk extends BaseSdkClient {
     const url = `${this.baseSubaccountUrl}/subaccounts/api-key/${subaccountId}/statement`;
 
     const { data } = await this.http.get<PaginatedListResponse<StatementResponse>>(
+      url,
+      {
+        params: {
+          ...filters,
+          ...pagination,
+        },
+      }
+    );
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated list of subaccount balances (available and pending).
+   * Supports optional filtering by subaccount IDs.
+   * * @param filters - Optional filters to apply (subaccountIds).
+   * @param pagination - Optional pagination parameters (`page` and `pageSize`).
+   * @returns A promise that resolves to a paginated list of balance entries.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async getBalances(
+    filters?: FilterBalanceInput,
+    pagination?: PaginationInput
+  ): Promise<PaginatedListResponse<SubaccountBalanceResponse>> {
+    const url = `${this.baseSubaccountUrl}/subaccounts/api-key/balances`;
+
+    const { data } = await this.http.get<PaginatedListResponse<SubaccountBalanceResponse>>(
       url,
       {
         params: {
