@@ -10,6 +10,8 @@ import { CreateSlipDepositRequestInput } from "../dto/deposit-request/slip/creat
 import { SubaccountResponse } from "../dto/subaccount/create/create-subaccount-response.interface.js";
 import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/create/create-subaccount.interface.js";
 import { FilterSubaccountInput } from "../dto/subaccount/filter/filter-subaccounts.interface.js";
+import { FilterStatementInput } from "../dto/subaccount/statement/filter-statement.interface.js";
+import { StatementResponse } from "../dto/subaccount/statement/statement-response.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
 
 /**
@@ -192,6 +194,34 @@ export class TsdTechSdk extends BaseSdkClient {
       }
     );
 
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated subaccount statement (ledger entries).
+   * Supports optional filtering by entry types, operations, and date range.
+   * * @param subaccountId - The unique identifier (UUID) of the subaccount.
+   * @param filters - Optional filters to apply (types, operations, date range).
+   * @param pagination - Optional pagination parameters (`page` and `pageSize`).
+   * @returns A promise that resolves to a paginated list of statement entries.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async getStatement(
+    subaccountId: string,
+    filters?: FilterStatementInput,
+    pagination?: PaginationInput
+  ): Promise<PaginatedListResponse<StatementResponse>> {
+    const url = `${this.baseSubaccountUrl}/subaccounts/api-key/${subaccountId}/statement`;
+
+    const { data } = await this.http.get<PaginatedListResponse<StatementResponse>>(
+      url,
+      {
+        params: {
+          ...filters,
+          ...pagination,
+        },
+      }
+    );
     return data;
   }
 }
