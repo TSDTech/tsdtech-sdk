@@ -26,3 +26,6 @@ export type { DepositSplitItem } from './dto/deposit-request/pix/splits/deposit-
 export type { DepositSplitResponse } from './dto/deposit-request/pix/splits/deposit-split-response.interface.js';
 export type { FilterDepositSplitInput } from './dto/deposit-request/pix/splits/filter-deposit-splits.interface.js';
 export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
+export { LedgerEntryTypeEnum } from './dto/subaccount/statement/ledger-entry-type.enum.js';
+export type { FilterStatementInput } from './dto/subaccount/statement/filter-statement.interface.js';
+export type { StatementResponse } from './dto/subaccount/statement/statement-response.interface.js';
