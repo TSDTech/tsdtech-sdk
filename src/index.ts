@@ -3,8 +3,11 @@
  * @packageDocumentation
  */
 
+export { validateWebhookSignature, signPayload } from './security/validate-webhook-signature.js';
+export type { WebhookSignatureValidationParams, WebhookSignatureValidationResult } from './security/validate-webhook-signature.js';
 export { TsdTechSdk } from './client/sdk.client.js';
-export { BaseSdkClient } from './client/base-sdk.client.js';
+export { BaseSdkClient, BASE_ENVIRONMENT_URLS } from './client/base-sdk.client.js';
+export type { SdkEnvironment } from './client/base-sdk.client.js';
 export type { CreatePixDepositRequestInput } from './dto/deposit-request/pix/create-pix-deposit-request.interface.js';
 export type { CreateGenericDepositRequestInput } from './dto/deposit-request/create-generic-deposit-request.interface.js';
 export type { DepositRequestResponse } from './dto/deposit-request/pix/deposit-request-response.interface.js';
@@ -28,3 +31,9 @@ export type { WithdrawalRequestResponse } from './dto/withdrawal-request/withdra
 export type { FilterWithdrawalRequestInput } from './dto/withdrawal-request/filter-withdrawal-request-input.interface.js';
 export { WithdrawalRequestStatusEnum } from './dto/withdrawal-request/withdrawal-request-status.enum.js';
 export { PinBankPaymentAccountTypeEnum } from './dto/withdrawal-request/pinbank-payment-account-type.enum.js';
+export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
+export { LedgerEntryTypeEnum } from './dto/subaccount/statement/ledger-entry-type.enum.js';
+export type { FilterStatementInput } from './dto/subaccount/statement/filter-statement.interface.js';
+export type { StatementResponse } from './dto/subaccount/statement/statement-response.interface.js';
+export type { FilterBalanceInput } from './dto/subaccount/balance/filter-balance.interface.js';
+export type { SubaccountBalanceResponse } from './dto/subaccount/balance/subaccount-balance-response.interface.js';

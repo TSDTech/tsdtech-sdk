@@ -43,6 +43,7 @@ import crypto from "crypto";
 const sdk = new TsdTechSdk({
   bankingApiKey: process.env.BANKING_API_KEY,
   bankingOrgId: process.env.BANKING_ORG_ID,
+  environment: 'hml',
 });
 
 // Criar depósito PIX
