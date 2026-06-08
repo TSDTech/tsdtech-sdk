@@ -1,7 +1,7 @@
 /**
  * SPA Checkout SDK
  * @packageDocumentation
-*/
+ */
 
 export { validateWebhookSignature, signPayload } from './security/validate-webhook-signature.js';
 export type { WebhookSignatureValidationParams, WebhookSignatureValidationResult } from './security/validate-webhook-signature.js';
@@ -27,3 +27,8 @@ export type { DepositSplitResponse } from './dto/deposit-request/pix/splits/depo
 export type { FilterDepositSplitInput } from './dto/deposit-request/pix/splits/filter-deposit-splits.interface.js';
 export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
 export type { DepositRequestPublicStatus } from './dto/deposit-request/public/deposit-request-public-status.interface.js';
+export { LedgerEntryTypeEnum } from './dto/subaccount/statement/ledger-entry-type.enum.js';
+export type { FilterStatementInput } from './dto/subaccount/statement/filter-statement.interface.js';
+export type { StatementResponse } from './dto/subaccount/statement/statement-response.interface.js';
+export type { FilterBalanceInput } from './dto/subaccount/balance/filter-balance.interface.js';
+export type { SubaccountBalanceResponse } from './dto/subaccount/balance/subaccount-balance-response.interface.js';
