@@ -94,6 +94,7 @@ import { TsdTechSdk } from "tsdtech-sdk";
 const sdk = new TsdTechSdk({
   bankingApiKey: "your-api-key-here",
   bankingOrgId: "your-org-id-uuid",
+  environment: 'hml',
 });
 ```
 
@@ -378,6 +379,7 @@ export class CheckoutService {
     this.sdk = new TsdTechSdk({
       bankingApiKey: process.env.BANKING_API_KEY,
       bankingOrgId: process.env.BANKING_ORG_ID,
+      environment: 'hml',
     });
   }
 
@@ -619,6 +621,7 @@ import {
 const sdk = new TsdTechSdk({
   bankingApiKey: "...",
   bankingOrgId: "...",
+  environment: 'hml',
 });
 
 const pixDeposit = await sdk.createPixDepositRequest(
