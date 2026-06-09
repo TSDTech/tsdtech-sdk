@@ -37,6 +37,9 @@ export class BaseSdkClient {
         'org-id': params.bankingOrgId,
         'x-api-key': params.bankingApiKey,
       },
+      paramsSerializer: {
+        indexes: false,
+      }
     });
   }
 
