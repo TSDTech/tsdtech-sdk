@@ -38,7 +38,7 @@ export class BaseSdkClient {
         'x-api-key': params.bankingApiKey,
       },
       paramsSerializer: {
-        indexes: false,
+        indexes: null,
       }
     });
   }
