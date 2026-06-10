@@ -15,6 +15,9 @@ import { StatementResponse } from "../dto/subaccount/statement/statement-respons
 import { FilterBalanceInput } from "../dto/subaccount/balance/filter-balance.interface.js";
 import { SubaccountBalanceResponse } from "../dto/subaccount/balance/subaccount-balance-response.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
+import { CreateWithdrawalRequestInput } from "../dto/withdrawal-request/create-withdrawal-request-input.interface.js";
+import { WithdrawalRequestResponse } from "../dto/withdrawal-request/withdrawal-request-response.interface.js";
+import { FilterWithdrawalRequestInput } from "../dto/withdrawal-request/filter-withdrawal-request-input.interface.js";
 
 /**
  * Main client for the TSD Tech SDK.
@@ -196,6 +199,59 @@ export class TsdTechSdk extends BaseSdkClient {
       }
     );
 
+    return data;
+  }
+
+  /**
+   * Creates a withdrawal request for a specific subaccount.
+   * Supports three destination types: internal subaccount transfer, external PIX, or external TED.
+   * @param input - The payload containing the source subaccount ID, amount, and exactly one destination descriptor.
+   * @param idempotencyKey - A unique identifier (e.g., UUIDv4) to guarantee the idempotency of the request and prevent duplicate withdrawals.
+   * @returns A promise that resolves to the created withdrawal request details.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async createWithdrawalRequest(
+    input: CreateWithdrawalRequestInput,
+    idempotencyKey: string
+  ): Promise<WithdrawalRequestResponse> {
+    const url = `${this.baseSubaccountUrl}/withdrawal-request/api-key/create`;
+
+    const { data } = await this.http.post<WithdrawalRequestResponse>(
+      url,
+      input,
+      {
+        headers: {
+          'idempotency-key': idempotencyKey,
+        },
+      }
+    );
+
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated list of withdrawal requests.
+   * Supports optional filtering by IDs, subaccount IDs, statuses, PIX keys, idempotency keys, and creation date.
+   * @param filters - Optional filters to apply to the search query.
+   * @param pagination - Optional pagination parameters (`page` and `pageSize`).
+   * @returns A promise that resolves to a paginated list of withdrawal requests.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async getWithdrawalRequests(
+    filters?: FilterWithdrawalRequestInput,
+    pagination?: PaginationInput
+  ): Promise<PaginatedListResponse<WithdrawalRequestResponse>> {
+    const url = `${this.baseSubaccountUrl}/withdrawal-request/api-key`;
+
+    const { data } = await this.http.get<PaginatedListResponse<WithdrawalRequestResponse>>(
+      url,
+      {
+        params: {
+          ...filters,
+          ...pagination,
+        },
+      }
+    );
     return data;
   }
 
