@@ -15,6 +15,7 @@ import { StatementResponse } from "../dto/subaccount/statement/statement-respons
 import { FilterBalanceInput } from "../dto/subaccount/balance/filter-balance.interface.js";
 import { SubaccountBalanceResponse } from "../dto/subaccount/balance/subaccount-balance-response.interface.js";
 import { SimulatePaymentInput } from "../dto/deposit-request/simulate/simulate-payment-input.interface.js";
+import { SimulatePaymentResponse } from "../dto/deposit-request/simulate/simulate-payment-response.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
 import { CreateWithdrawalRequestInput } from "../dto/withdrawal-request/create-withdrawal-request-input.interface.js";
 import { WithdrawalRequestResponse } from "../dto/withdrawal-request/withdrawal-request-response.interface.js";
@@ -321,10 +322,10 @@ export class TsdTechSdk extends BaseSdkClient {
    */
   public async simulatePayment(
     input: SimulatePaymentInput
-  ): Promise<DepositRequestResponse> {
+  ): Promise<SimulatePaymentResponse> {
     const url = `${this.baseSubaccountUrl}/deposit-request/api-key/simulate-payment`;
 
-    const { data } = await this.http.post<DepositRequestResponse>(url, input);
+    const { data } = await this.http.post<SimulatePaymentResponse>(url, input);
     return data;
   }
 }
