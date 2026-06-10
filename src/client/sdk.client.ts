@@ -14,6 +14,7 @@ import { FilterStatementInput } from "../dto/subaccount/statement/filter-stateme
 import { StatementResponse } from "../dto/subaccount/statement/statement-response.interface.js";
 import { FilterBalanceInput } from "../dto/subaccount/balance/filter-balance.interface.js";
 import { SubaccountBalanceResponse } from "../dto/subaccount/balance/subaccount-balance-response.interface.js";
+import { SimulatePaymentInput } from "../dto/deposit-request/simulate/simulate-payment-input.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
 import { CreateWithdrawalRequestInput } from "../dto/withdrawal-request/create-withdrawal-request-input.interface.js";
 import { WithdrawalRequestResponse } from "../dto/withdrawal-request/withdrawal-request-response.interface.js";
@@ -306,6 +307,24 @@ export class TsdTechSdk extends BaseSdkClient {
         },
       }
     );
+    return data;
+  }
+
+  /**
+   * Simulates a PIX payment for a deposit request.
+   * **This method is only available in development and staging environments.**
+   * In production, this method will throw a ForbiddenException.
+   * @param input - The payload containing the deposit request ID to simulate payment for.
+   * @returns A promise that resolves to the updated deposit request with status PAID.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   * @throws {ForbiddenException} If called in production environment.
+   */
+  public async simulatePayment(
+    input: SimulatePaymentInput
+  ): Promise<DepositRequestResponse> {
+    const url = `${this.baseSubaccountUrl}/deposit-request/api-key/simulate-payment`;
+
+    const { data } = await this.http.post<DepositRequestResponse>(url, input);
     return data;
   }
 }
