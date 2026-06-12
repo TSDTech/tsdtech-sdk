@@ -25,9 +25,17 @@ export { DepositSplitStatus } from './dto/deposit-request/pix/splits/split-statu
 export type { DepositSplitItem } from './dto/deposit-request/pix/splits/deposit-split-item.interface.js';
 export type { DepositSplitResponse } from './dto/deposit-request/pix/splits/deposit-split-response.interface.js';
 export type { FilterDepositSplitInput } from './dto/deposit-request/pix/splits/filter-deposit-splits.interface.js';
+export type { CreateWithdrawalRequestInput } from './dto/withdrawal-request/create-withdrawal-request-input.interface.js';
+export type { BeneficiaryData } from './dto/withdrawal-request/beneficiary-data.interface.js';
+export type { WithdrawalRequestResponse } from './dto/withdrawal-request/withdrawal-request-response.interface.js';
+export type { FilterWithdrawalRequestInput } from './dto/withdrawal-request/filter-withdrawal-request-input.interface.js';
+export { WithdrawalRequestStatusEnum } from './dto/withdrawal-request/withdrawal-request-status.enum.js';
+export { PinBankPaymentAccountTypeEnum } from './dto/withdrawal-request/pinbank-payment-account-type.enum.js';
 export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
 export { LedgerEntryTypeEnum } from './dto/subaccount/statement/ledger-entry-type.enum.js';
 export type { FilterStatementInput } from './dto/subaccount/statement/filter-statement.interface.js';
 export type { StatementResponse } from './dto/subaccount/statement/statement-response.interface.js';
 export type { FilterBalanceInput } from './dto/subaccount/balance/filter-balance.interface.js';
 export type { SubaccountBalanceResponse } from './dto/subaccount/balance/subaccount-balance-response.interface.js';
+export type { SimulatePaymentInput } from './dto/deposit-request/simulate/simulate-payment-input.interface.js';
+export type { SimulatePaymentResponse } from './dto/deposit-request/simulate/simulate-payment-response.interface.js';
