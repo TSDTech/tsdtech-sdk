@@ -39,3 +39,6 @@ export type { FilterBalanceInput } from './dto/subaccount/balance/filter-balance
 export type { SubaccountBalanceResponse } from './dto/subaccount/balance/subaccount-balance-response.interface.js';
 export type { SimulatePaymentInput } from './dto/deposit-request/simulate/simulate-payment-input.interface.js';
 export type { SimulatePaymentResponse } from './dto/deposit-request/simulate/simulate-payment-response.interface.js';
+export type { FeeConfigResponse } from './dto/fee-config/fee-config-response.interface.js';
+export type { FilterFeeConfigInput } from './dto/fee-config/filter-fee-config-input.interface.js';
+export { FeeConfigStatusEnum } from './dto/fee-config/fee-config-status.enum.js';

@@ -20,6 +20,8 @@ import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
 import { CreateWithdrawalRequestInput } from "../dto/withdrawal-request/create-withdrawal-request-input.interface.js";
 import { WithdrawalRequestResponse } from "../dto/withdrawal-request/withdrawal-request-response.interface.js";
 import { FilterWithdrawalRequestInput } from "../dto/withdrawal-request/filter-withdrawal-request-input.interface.js";
+import { FilterFeeConfigInput } from "../dto/fee-config/filter-fee-config-input.interface.js";
+import { FeeConfigResponse } from "../dto/fee-config/fee-config-response.interface.js";
 
 /**
  * Main client for the TSD Tech SDK.
@@ -326,6 +328,32 @@ export class TsdTechSdk extends BaseSdkClient {
     const url = `${this.baseSubaccountUrl}/deposit-request/api-key/simulate-payment`;
 
     const { data } = await this.http.post<SimulatePaymentResponse>(url, input);
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated list of fee configurations for the authenticated organization.
+   * Supports optional filtering by fee config IDs, payment methods, and statuses.
+   * @param filters - Optional filters to apply to the search query.
+   * @param pagination - Optional pagination parameters (`page` and `pageSize`).
+   * @returns A promise that resolves to a paginated list of fee configurations.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async getFeeConfigs(
+    filters?: FilterFeeConfigInput,
+    pagination?: PaginationInput
+  ): Promise<PaginatedListResponse<FeeConfigResponse>> {
+    const url = `${this.baseSubaccountUrl}/fee-configs/api-key`;
+
+    const { data } = await this.http.get<PaginatedListResponse<FeeConfigResponse>>(
+      url,
+      {
+        params: {
+          ...filters,
+          ...pagination,
+        },
+      }
+    );
     return data;
   }
 }
