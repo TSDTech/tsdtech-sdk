@@ -17,7 +17,14 @@ import { FilterStatementInput } from "../dto/subaccount/statement/filter-stateme
 import { StatementResponse } from "../dto/subaccount/statement/statement-response.interface.js";
 import { FilterBalanceInput } from "../dto/subaccount/balance/filter-balance.interface.js";
 import { SubaccountBalanceResponse } from "../dto/subaccount/balance/subaccount-balance-response.interface.js";
+import { SimulatePaymentInput } from "../dto/deposit-request/simulate/simulate-payment-input.interface.js";
+import { SimulatePaymentResponse } from "../dto/deposit-request/simulate/simulate-payment-response.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
+import { CreateWithdrawalRequestInput } from "../dto/withdrawal-request/create-withdrawal-request-input.interface.js";
+import { WithdrawalRequestResponse } from "../dto/withdrawal-request/withdrawal-request-response.interface.js";
+import { FilterWithdrawalRequestInput } from "../dto/withdrawal-request/filter-withdrawal-request-input.interface.js";
+import { FilterFeeConfigInput } from "../dto/fee-config/filter-fee-config-input.interface.js";
+import { FeeConfigResponse } from "../dto/fee-config/fee-config-response.interface.js";
 
 /**
  * Main client for the TSD Tech SDK.
@@ -228,6 +235,60 @@ export class TsdTechSdk extends BaseSdkClient {
     return response.data as CardDepositRequestResponse;
   }
    /* Retrieves a paginated subaccount statement (ledger entries).
+   * Creates a withdrawal request for a specific subaccount.
+   * Supports three destination types: internal subaccount transfer, external PIX, or external TED.
+   * @param input - The payload containing the source subaccount ID, amount, and exactly one destination descriptor.
+   * @param idempotencyKey - A unique identifier (e.g., UUIDv4) to guarantee the idempotency of the request and prevent duplicate withdrawals.
+   * @returns A promise that resolves to the created withdrawal request details.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async createWithdrawalRequest(
+    input: CreateWithdrawalRequestInput,
+    idempotencyKey: string
+  ): Promise<WithdrawalRequestResponse> {
+    const url = `${this.baseSubaccountUrl}/withdrawal-request/api-key/create`;
+
+    const { data } = await this.http.post<WithdrawalRequestResponse>(
+      url,
+      input,
+      {
+        headers: {
+          'idempotency-key': idempotencyKey,
+        },
+      }
+    );
+
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated list of withdrawal requests.
+   * Supports optional filtering by IDs, subaccount IDs, statuses, PIX keys, idempotency keys, and creation date.
+   * @param filters - Optional filters to apply to the search query.
+   * @param pagination - Optional pagination parameters (`page` and `pageSize`).
+   * @returns A promise that resolves to a paginated list of withdrawal requests.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async getWithdrawalRequests(
+    filters?: FilterWithdrawalRequestInput,
+    pagination?: PaginationInput
+  ): Promise<PaginatedListResponse<WithdrawalRequestResponse>> {
+    const url = `${this.baseSubaccountUrl}/withdrawal-request/api-key`;
+
+    const { data } = await this.http.get<PaginatedListResponse<WithdrawalRequestResponse>>(
+      url,
+      {
+        params: {
+          ...filters,
+          ...pagination,
+        },
+      }
+    );
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated subaccount statement (ledger entries).
    * Supports optional filtering by entry types, operations, and date range.
    * * @param subaccountId - The unique identifier (UUID) of the subaccount.
    * @param filters - Optional filters to apply (types, operations, date range).
@@ -269,6 +330,50 @@ export class TsdTechSdk extends BaseSdkClient {
     const url = `${this.baseSubaccountUrl}/subaccounts/api-key/balances`;
 
     const { data } = await this.http.get<PaginatedListResponse<SubaccountBalanceResponse>>(
+      url,
+      {
+        params: {
+          ...filters,
+          ...pagination,
+        },
+      }
+    );
+    return data;
+  }
+
+  /**
+   * Simulates a PIX payment for a deposit request.
+   * **This method is only available in development and staging environments.**
+   * In production, this method will throw a ForbiddenException.
+   * @param input - The payload containing the deposit request ID to simulate payment for.
+   * @returns A promise that resolves to the updated deposit request with status PAID.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   * @throws {ForbiddenException} If called in production environment.
+   */
+  public async simulatePayment(
+    input: SimulatePaymentInput
+  ): Promise<SimulatePaymentResponse> {
+    const url = `${this.baseSubaccountUrl}/deposit-request/api-key/simulate-payment`;
+
+    const { data } = await this.http.post<SimulatePaymentResponse>(url, input);
+    return data;
+  }
+
+  /**
+   * Retrieves a paginated list of fee configurations for the authenticated organization.
+   * Supports optional filtering by fee config IDs, payment methods, and statuses.
+   * @param filters - Optional filters to apply to the search query.
+   * @param pagination - Optional pagination parameters (`page` and `pageSize`).
+   * @returns A promise that resolves to a paginated list of fee configurations.
+   * @throws {CheckoutApiError} If the API returns an error or a bad request.
+   */
+  public async getFeeConfigs(
+    filters?: FilterFeeConfigInput,
+    pagination?: PaginationInput
+  ): Promise<PaginatedListResponse<FeeConfigResponse>> {
+    const url = `${this.baseSubaccountUrl}/fee-configs/api-key`;
+
+    const { data } = await this.http.get<PaginatedListResponse<FeeConfigResponse>>(
       url,
       {
         params: {
