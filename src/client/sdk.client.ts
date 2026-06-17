@@ -17,6 +17,8 @@ import { SubaccountBalanceResponse } from "../dto/subaccount/balance/subaccount-
 import { SimulatePaymentInput } from "../dto/deposit-request/simulate/simulate-payment-input.interface.js";
 import { SimulatePaymentResponse } from "../dto/deposit-request/simulate/simulate-payment-response.interface.js";
 import { BaseSdkClient, SdkEnvironment } from "./base-sdk.client.js";
+import { DepositRequestPublicStatus } from "../dto/deposit-request/public/deposit-request-public-status.interface.js";
+import axios from "axios";
 import { CreateWithdrawalRequestInput } from "../dto/withdrawal-request/create-withdrawal-request-input.interface.js";
 import { WithdrawalRequestResponse } from "../dto/withdrawal-request/withdrawal-request-response.interface.js";
 import { FilterWithdrawalRequestInput } from "../dto/withdrawal-request/filter-withdrawal-request-input.interface.js";
@@ -207,6 +209,28 @@ export class TsdTechSdk extends BaseSdkClient {
   }
 
   /**
+   * Retrieves the status and details of a Pix deposit request by its ID.
+   * @param depositRequestId - The unique identifier (UUID) of the deposit request.
+   * @returns A promise that resolves to the public status of the deposit request.
+   * @throws {Error} If the API returns a 404 or other errors.
+   */
+  public async getPixDepositStatus(
+    depositRequestId: string
+  ): Promise<DepositRequestPublicStatus> {
+    const url = `${this.baseSubaccountUrl}/deposit-request/public/status-pix/${depositRequestId}`;
+
+    try {
+      const { data } = await this.http.get<DepositRequestPublicStatus>(url);
+      return data;
+    } catch (error: any) {
+      console.error('Error fetching deposit request status:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        throw new Error(`Deposito PIX com ID '${depositRequestId}' não encontrado.`);
+      }
+      
+      throw error;
+    }
+  }
    * Creates a withdrawal request for a specific subaccount.
    * Supports three destination types: internal subaccount transfer, external PIX, or external TED.
    * @param input - The payload containing the source subaccount ID, amount, and exactly one destination descriptor.
