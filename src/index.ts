@@ -32,6 +32,11 @@ export type { FilterWithdrawalRequestInput } from './dto/withdrawal-request/filt
 export { WithdrawalRequestStatusEnum } from './dto/withdrawal-request/withdrawal-request-status.enum.js';
 export { PinBankPaymentAccountTypeEnum } from './dto/withdrawal-request/pinbank-payment-account-type.enum.js';
 export { DocumentTypeEnum } from './dto/subaccount-holder/document-type.enum.js';
+export { SubaccountHolderStatusEnum } from './dto/subaccount-holder/subaccount-holder-status.enum.js';
+
+// Card Deposit Request & Splits
+export { CreateCardDepositRequestDto, CardDepositRequestResponse } from './dto/deposit-request/card/create-card-deposit-request.interface.js';
+export { validateCardSplits } from './dto/deposit-request/card/validate-card-splits.js';
 export type { DepositRequestPublicStatus } from './dto/deposit-request/public/deposit-request-public-status.interface.js';
 export { LedgerEntryTypeEnum } from './dto/subaccount/statement/ledger-entry-type.enum.js';
 export type { FilterStatementInput } from './dto/subaccount/statement/filter-statement.interface.js';

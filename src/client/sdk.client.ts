@@ -10,6 +10,9 @@ import { CreateSlipDepositRequestInput } from "../dto/deposit-request/slip/creat
 import { SubaccountResponse } from "../dto/subaccount/create/create-subaccount-response.interface.js";
 import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/create/create-subaccount.interface.js";
 import { FilterSubaccountInput } from "../dto/subaccount/filter/filter-subaccounts.interface.js";
+import { BaseSdkClient } from "./base-sdk.client.js";
+import { CardDepositRequestResponse, CreateCardDepositRequestDto } from "../dto/deposit-request/card/create-card-deposit-request.interface.js";
+import { validateCardSplits } from "../dto/deposit-request/card/validate-card-splits.js";
 import { FilterStatementInput } from "../dto/subaccount/statement/filter-statement.interface.js";
 import { StatementResponse } from "../dto/subaccount/statement/statement-response.interface.js";
 import { FilterBalanceInput } from "../dto/subaccount/balance/filter-balance.interface.js";
@@ -209,6 +212,31 @@ export class TsdTechSdk extends BaseSdkClient {
   }
 
   /**
+   * Cria uma requisição de depósito via Cartão com suporte opcional a Split Rules.
+   * * @param dto Dados da transação (cartão, valor, subconta e splits)
+   * @returns Promise<CardDepositRequestResponse>
+   */
+  public async createCardDepositRequest(
+    dto: CreateCardDepositRequestDto
+  ): Promise<CardDepositRequestResponse> {
+    // 1. Validação Client-Side dos Splits
+    validateCardSplits(dto.amount, dto.splits);
+
+    // 2. Preparar Payload (Garante o default de 1 parcela)
+    const payload: CreateCardDepositRequestDto = {
+      ...dto,
+      installmentNumber: dto.installmentNumber ?? 1,
+    };
+
+    // 3. Chamada à API
+    const response = await this.http.post(
+      '/deposit-request/card',
+      payload
+    );
+
+    return response.data as CardDepositRequestResponse;
+  }
+   /* Retrieves a paginated subaccount statement (ledger entries).
    * Retrieves the status and details of a Pix deposit request by its ID.
    * @param depositRequestId - The unique identifier (UUID) of the deposit request.
    * @returns A promise that resolves to the public status of the deposit request.
