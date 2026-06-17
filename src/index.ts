@@ -37,6 +37,7 @@ export { SubaccountHolderStatusEnum } from './dto/subaccount-holder/subaccount-h
 // Card Deposit Request & Splits
 export { CreateCardDepositRequestDto, CardDepositRequestResponse } from './dto/deposit-request/card/create-card-deposit-request.interface.js';
 export { validateCardSplits } from './dto/deposit-request/card/validate-card-splits.js';
+export type { DepositRequestPublicStatus } from './dto/deposit-request/public/deposit-request-public-status.interface.js';
 export { LedgerEntryTypeEnum } from './dto/subaccount/statement/ledger-entry-type.enum.js';
 export type { FilterStatementInput } from './dto/subaccount/statement/filter-statement.interface.js';
 export type { StatementResponse } from './dto/subaccount/statement/statement-response.interface.js';
