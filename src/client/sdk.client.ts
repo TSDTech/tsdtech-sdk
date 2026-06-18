@@ -10,7 +10,6 @@ import { CreateSlipDepositRequestInput } from "../dto/deposit-request/slip/creat
 import { SubaccountResponse } from "../dto/subaccount/create/create-subaccount-response.interface.js";
 import { CreateSubaccountInput as CreateSubaccount } from "../dto/subaccount/create/create-subaccount.interface.js";
 import { FilterSubaccountInput } from "../dto/subaccount/filter/filter-subaccounts.interface.js";
-import { BaseSdkClient } from "./base-sdk.client.js";
 import { CardDepositRequestResponse, CreateCardDepositRequestDto } from "../dto/deposit-request/card/create-card-deposit-request.interface.js";
 import { validateCardSplits } from "../dto/deposit-request/card/validate-card-splits.js";
 import { FilterStatementInput } from "../dto/subaccount/statement/filter-statement.interface.js";
@@ -27,6 +26,7 @@ import { WithdrawalRequestResponse } from "../dto/withdrawal-request/withdrawal-
 import { FilterWithdrawalRequestInput } from "../dto/withdrawal-request/filter-withdrawal-request-input.interface.js";
 import { FilterFeeConfigInput } from "../dto/fee-config/filter-fee-config-input.interface.js";
 import { FeeConfigResponse } from "../dto/fee-config/fee-config-response.interface.js";
+import { url } from "node:inspector";
 
 /**
  * Main client for the TSD Tech SDK.
@@ -259,6 +259,8 @@ export class TsdTechSdk extends BaseSdkClient {
       throw error;
     }
   }
+
+  /**
    * Creates a withdrawal request for a specific subaccount.
    * Supports three destination types: internal subaccount transfer, external PIX, or external TED.
    * @param input - The payload containing the source subaccount ID, amount, and exactly one destination descriptor.

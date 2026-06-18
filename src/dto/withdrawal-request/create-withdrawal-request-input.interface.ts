@@ -19,6 +19,8 @@ export interface CreateWithdrawalRequestInput {
   destinationSubaccountId?: string;
   /** (PIX) The PIX key of the external recipient. */
   pixKey?: string;
-  /** (TED) Bank account details for an external TED transfer. */
+  /**(TED) The tax ID (CPF/CNPJ) of the beneficiary for an external TED transfer. Required if `beneficiary` is provided.*/
+  taxId?: string;
+  /**(TED) Bank account details for an external TED transfer.*/
   beneficiary?: BeneficiaryData;
 }
