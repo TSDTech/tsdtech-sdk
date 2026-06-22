@@ -4,7 +4,7 @@ export type SdkEnvironment = 'hml' | 'prod';
 
 export const BASE_ENVIRONMENT_URLS: Partial<Record<SdkEnvironment, string>> = {
   hml: 'https://hml-back-ms-subaccount-1041798165885.southamerica-east1.run.app',
-  prod: 'https://prod-back-ms-subaccount-120019095628.southamerica-east1.run.app',
+  prod: 'https://subaccount.tsdtech.com.br',
 };
 
 export class BaseSdkClient {
